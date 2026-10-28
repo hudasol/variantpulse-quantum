@@ -1,0 +1,14 @@
+# Organiser files are not redistributed
+data/
+external/
+
+# Generated outputs stay local until the competition stages are submitted
+results/
+midpoint/
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
