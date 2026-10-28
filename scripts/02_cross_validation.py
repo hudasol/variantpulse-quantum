@@ -63,10 +63,19 @@ if __name__ == "__main__":
     OUT.parent.mkdir(exist_ok=True)
     X, meta = load_pool()
     folds = list(patient_folds(meta["label"], meta.index, N_SPLITS, N_REPEATS, SEED))
-    print(f"{len(folds)} folds, {N_JOBS} workers", flush=True)
-    OUT.write_text("")
+    # Resume: folds already written to the log are skipped, so an interrupted run can be continued.
+    finished = set()
+    if OUT.exists():
+        for line in OUT.read_text().splitlines():
+            if line.strip():
+                record = json.loads(line)
+                finished.add((record["repeat"], record["fold"]))
+    else:
+        OUT.write_text("")
+    todo = [f for f in folds if (f["repeat"], f["fold"]) not in finished]
+    print(f"{len(folds)} folds in total, {len(finished)} already done, {len(todo)} to run, {N_JOBS} workers", flush=True)
     start = time.perf_counter()
-    for i, result in enumerate(Parallel(n_jobs=N_JOBS, return_as="generator")(delayed(work)(f) for f in folds)):
+    for i, result in enumerate(Parallel(n_jobs=N_JOBS, return_as="generator")(delayed(work)(f) for f in todo)):
         with OUT.open("a") as handle:
             handle.write(json.dumps(result, default=to_python) + "\n")
-        print(f"fold {i + 1}/{len(folds)} done, {time.perf_counter() - start:.0f}s elapsed", flush=True)
+        print(f"fold {len(finished) + i + 1}/{len(folds)} done, {time.perf_counter() - start:.0f}s elapsed", flush=True)
