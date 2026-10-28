@@ -9,7 +9,8 @@ r_i is the relevance of gene i, scaled to (0, 1] (absolute Welch t statistic div
 largest in the shortlist). c_ij is the redundancy of a pair, the absolute Pearson correlation
 between the two genes across training patients. alpha = 1 and beta = 2 / (k - 1), which gives
 the mean relevance and the mean redundancy of a k gene panel the same weight, as in mRMR.
-The penalty weight lam is tuned from training data only (see `tune_lambda`).
+The penalty weight lam is set from training data only. `lambda_min` gives the smallest weight
+for which the global optimum has exactly k genes, and `make_problem` uses twice that value.
 
 As a matrix, E(x) = x^T Q x + lam * k^2, so the constant lam * k^2 is left out of Q.
 """
