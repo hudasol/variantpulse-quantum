@@ -171,7 +171,7 @@ inn, exo = CV["submitted_gene_in_fold_shortlist"], CV["submitted_gene_in_fold_ex
 g1, g2, g3, g4 = "SERPINB13", "CALML3", "TMEM40", "PIP4K2B"
 story += [P(f"6. Cross validation results ({n_folds} folds, validation patients only)", h), res, Spacer(1, 3), P(
     f"Validation AUROC is close to 1.00 for almost every method, so on {S['patients']} patients it cannot separate them"
-    f"{' (the exceptions are ' + ', '.join(n.lower() for n in low_auc) + ')' if low_auc else ''}. Log loss can, but its spread across folds "
+    f"{(' (the exception is ' if len(low_auc) == 1 else ' (the exceptions are ') + ', '.join(n.lower() for n in low_auc) + ')' if low_auc else ''}. Log loss can, but its spread across folds "
     f"is about {ll_sd:.2f}, so small gaps are not meaningful. QAOA returned the exact QUBO optimum in {pct(qa['found_optimum'].min())} to "
     f"{pct(qa['found_optimum'].max())} of runs, against {pct(fr)} for random sampling with the same final shots, {pct(ft)} with the same "
     f"total shots and {pct(sa_)} for simulated annealing. The most probable QAOA bitstring {top_txt}, which is why we read the panel from "
