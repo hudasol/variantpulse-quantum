@@ -40,11 +40,16 @@ for fold in folds:
             model = make_classifier().fit(X.loc[tr, row["panel"]].to_numpy(float), y.loc[tr].to_numpy())
             p = model.predict_proba(X.loc[va, row["panel"]].to_numpy(float))[:, 1]
             loss = log_loss(y.loc[va].to_numpy(), np.clip(p, 1e-6, 1 - 1e-6), labels=[0, 1])
+        # Same panel as the exact optimum of the fold's QUBO. QUBO methods log this themselves;
+        # for the other methods it is the plain comparison of gene sets.
+        same = row.get("found_optimum")
+        if same is None and row.get("panel"):
+            same = set(row["panel"]) == set(fold["info"]["exact_panel"])
         records.append({
             "repeat": fold["repeat"], "fold": fold["fold"], "method": label,
             "auroc": row.get("auroc"), "log_loss": loss,
             "has_panel": row.get("panel") is not None,
-            "found_optimum": row.get("found_optimum"),
+            "found_optimum": same,
             "prob_right_size": row.get("prob_right_size"),
             "top_bitstring_right_size": None if row.get("most_probable_size") is None else row["most_probable_size"] == 4,
         })
